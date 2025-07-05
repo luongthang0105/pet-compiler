@@ -127,6 +127,7 @@ auto tokens_to_asm(const std::vector<Token> &tokens) -> std::string
             std::string int_literal = tokens[i + 1].value.value();
             output << "\tmov rax, 60\n";
             output << "\tmov rdi, " << int_literal << "\n";
+            output << "\tsyscall";
             i += 2;
         }
     }
