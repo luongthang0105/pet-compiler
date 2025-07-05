@@ -152,7 +152,7 @@ auto main(int argc, char *argv[]) -> int
 
     auto tokens = tokenize(contents);
     {
-        auto output = std::ofstream{"hydro.asm", std::ios_base::out};
+        auto output = std::ofstream{"../hydro_example.asm", std::ios_base::out};
         output << tokens_to_asm(tokens);
     }
     return EXIT_SUCCESS;
