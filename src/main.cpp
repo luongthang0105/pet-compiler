@@ -115,7 +115,7 @@ auto tokens_to_asm(const std::vector<Token> &tokens) -> std::string
 
     for (int i = 0; i < tokens.size(); ++i)
     {
-        if (tokens[i].type == TokenType::_return)
+        if (tokens[i].type == TokenType::exit)
         {
             // only proceeds if next 2 tokens are: int_literal then semicolon
             if (i + 1 >= tokens.size() || tokens[i + 1].type != TokenType::int_literal)
@@ -156,5 +156,9 @@ auto main(int argc, char *argv[]) -> int
         auto output = std::ofstream{"../hydro_example.asm", std::ios_base::out};
         output << tokens_to_asm(tokens);
     }
+
+    system("nasm -felf64 ../hydro_example.asm");
+    system("ld -o out ../hydro_example.o");
+
     return EXIT_SUCCESS;
 }
