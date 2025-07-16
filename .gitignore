@@ -1045,3 +1045,7 @@ dkms.conf
 *.dis
 
 *.asm
+
+# debugging files
+input.hy
+src/main
