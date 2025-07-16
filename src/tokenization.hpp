@@ -61,40 +61,39 @@ public:
         auto tokens = std::vector<Token>{};
         auto buffer = std::string{};
 
-        for (int i = 0; i < src_.size(); ++i)
+        while (peek().has_value())
         {
-            char c = src_[i];
+            char c = consume();
             if (std::isalpha(c))
             {
                 // got an alpha character, it must be the start of a non-int token
                 // now keep collecting the rest of the token
                 buffer.push_back(c);
 
-                ++i;
-                while (i < src_.size() && std::isalnum(src_[i]))
+                while (peek().has_value() && std::isalnum(peek().value()))
                 {
-                    buffer.push_back(src_[i]);
-                    ++i;
+                    buffer.push_back(consume());
                 }
-                --i;
 
                 if (buffer == "exit")
                 {
                     tokens.push_back(Token{.type = TokenType::exit, .value = std::nullopt});
                     buffer.clear();
                 }
+                else
+                {
+                    std::cerr << "Invalid token: " << c << std::endl;
+                    exit(EXIT_FAILURE);
+                }
             }
             else if (std::isdigit(c))
             {
                 buffer.push_back(c);
 
-                ++i;
-                while (i < src_.size() && std::isdigit(src_[i]))
+                while (peek().has_value() && std::isdigit(peek().value()))
                 {
-                    buffer.push_back(src_[i]);
-                    ++i;
+                    buffer.push_back(consume());
                 }
-                --i;
 
                 tokens.push_back(Token{.type = TokenType::int_literal, .value = buffer});
                 buffer.clear();
@@ -124,8 +123,9 @@ private:
 
     /**
      * @brief The index that we are currently up to within the source code string.
+     * @example If `index_ == 2`, it means that we have consumed index 0 and 1, but not index 2 yet.
      */
-    const int index_;
+    int index_;
 
     /**
      * @brief Peek the character in the source code, which is `offset` characters from the current index.
@@ -133,7 +133,7 @@ private:
      * @param offset The offset from current index.
      * @return If in bounds, returns the character that is `offset` characters from the current index. Otherwise, returns `std::nullopt`.
      */
-    [[nodiscard]] auto peek(int offset = 1) const -> std::optional<char>
+    [[nodiscard]] auto peek(int offset = 0) const -> std::optional<char>
     {
         if (index_ + offset >= src_.size())
         {
@@ -141,4 +141,14 @@ private:
         }
         return src_.at(index_ + offset);
     };
+
+    /**
+     * @brief Consumes the next character in the source code.
+     *
+     * @return The next character in the source code.
+     */
+    auto consume() -> char
+    {
+        return src_.at(index_++);
+    }
 };
