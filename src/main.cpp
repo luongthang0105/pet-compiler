@@ -48,7 +48,7 @@ auto main(int argc, char *argv[]) -> int
         contents = contents_stream.str();
     }
 
-    auto tokenizer = Tokenizer{contents};
+    auto tokenizer = Tokenizer{std::move(contents)};
     auto tokens = tokenizer.tokenize();
     {
         auto output = std::ofstream{"../hydro_example.asm", std::ios_base::out};
