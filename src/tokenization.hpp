@@ -52,9 +52,9 @@ std::ostream &operator<<(std::ostream &output, const Token &token)
 class Tokenizer
 {
 public:
-    // just taking a std::string, because it works well when given an lvalue or a string literal
+    // Just taking a std::string, because it works well when given an lvalue or a string literal.
     // If takes std::string&, it will leave the caller in unspecified state (cuz we steal the buffer from the caller)
-    Tokenizer(std::string src) : src_(std::move(src)), index_{0} {}
+    explicit Tokenizer(std::string src) : src_(std::move(src)), index_{0} {}
 
     auto tokenize() -> std::vector<Token>
     {
