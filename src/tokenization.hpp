@@ -125,7 +125,7 @@ private:
      * @brief The index that we are currently up to within the source code string.
      * @example If `index_ == 2`, it means that we have consumed index 0 and 1, but not index 2 yet.
      */
-    int index_;
+    size_t index_;
 
     /**
      * @brief Peek the character in the source code, which is `offset` characters from the current index.
@@ -133,7 +133,7 @@ private:
      * @param offset The offset from current index.
      * @return If in bounds, returns the character that is `offset` characters from the current index. Otherwise, returns `std::nullopt`.
      */
-    [[nodiscard]] auto peek(int offset = 0) const -> std::optional<char>
+    [[nodiscard]] auto peek(size_t offset = 0) const -> std::optional<char>
     {
         if (index_ + offset >= src_.size())
         {
