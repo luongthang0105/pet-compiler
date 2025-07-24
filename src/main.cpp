@@ -4,32 +4,9 @@
 #include <optional>
 #include <vector>
 #include "tokenization.hpp"
+#include "parser.hpp"
+#include "generation.hpp"
 
-auto tokens_to_asm(const std::vector<Token> &tokens) -> std::string
-{
-    std::stringstream output;
-    output << "global _start\n_start:\n";
-
-    for (int i = 0; i < tokens.size(); ++i)
-    {
-        if (tokens[i].type == TokenType::exit)
-        {
-            // only proceeds if next 2 tokens are: int_literal then semicolon
-            if (i + 1 >= tokens.size() || tokens[i + 1].type != TokenType::int_literal)
-                continue;
-
-            if (i + 2 >= tokens.size() || tokens[i + 2].type != TokenType::semicolon)
-                continue;
-
-            std::string int_literal = tokens[i + 1].value.value();
-            output << "\tmov rax, 60\n";
-            output << "\tmov rdi, " << int_literal << "\n";
-            output << "\tsyscall";
-            i += 2;
-        }
-    }
-    return output.str();
-}
 auto main(int argc, char *argv[]) -> int
 {
     if (argc != 2)
@@ -50,9 +27,20 @@ auto main(int argc, char *argv[]) -> int
 
     auto tokenizer = Tokenizer{std::move(contents)};
     auto tokens = tokenizer.tokenize();
+
+    auto parser = Parser{std::move(tokens)};
+    auto tree = parser.parse();
+
+    if (!tree.has_value())
+    {
+        std::cerr << "No VALID exit statement found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    auto generation = Generation(std::move(tree.value()));
     {
         auto output = std::ofstream{"../hydro_example.asm", std::ios_base::out};
-        output << tokens_to_asm(tokens);
+        output << generation.generate();
     }
 
     system("nasm -felf64 ../hydro_example.asm");
